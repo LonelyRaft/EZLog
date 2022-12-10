@@ -31,51 +31,91 @@
 #define LOG_LEVEL_CURR LOG_LEVEL_DEBUG
 #endif
 
+// fflush
+#ifdef LOG_USING_FLUSH
+#define LOG_FLUSH fflush(stderr);
+#else
+#define LOG_FLUSH
+#endif // LOG_USING_FLUSH
+
 // error
 #if LOG_LEVEL_ERROR >= LOG_LEVEL_CURR
-#define OUTPUT_ERR(fmt, ...)               \
-    fprintf(stderr,                        \
-            OUT_LEVEL_ERR fmt OUT_ENDFLAG, \
-            LOG_LABEL, ##__VA_ARGS__)
+#define OUTPUT_ERR(fmt, ...)                   \
+    {                                          \
+        fprintf(stderr,                        \
+                OUT_LEVEL_ERR fmt OUT_ENDFLAG, \
+                LOG_LABEL, ##__VA_ARGS__);     \
+        LOG_FLUSH                              \
+    }
 #define LOG_ERR(fmt, ...) OUTPUT_ERR(fmt, ##__VA_ARGS__)
 #else
-#define LOG_ERR(fmt, ...)
+#define LOG_ERR(fmt, ...) \
+    {                     \
+    }
 #endif
 
 // warning
 #if LOG_LEVEL_WARNING >= LOG_LEVEL_CURR
-#define OUTPUT_WARN(fmt, ...)              \
-    fprintf(stderr,                        \
-            OUT_LEVEL_WAR fmt OUT_ENDFLAG, \
-            LOG_LABEL, ##__VA_ARGS__)
+#define OUTPUT_WARN(fmt, ...)                  \
+    {                                          \
+        fprintf(stderr,                        \
+                OUT_LEVEL_WAR fmt OUT_ENDFLAG, \
+                LOG_LABEL, ##__VA_ARGS__);     \
+        LOG_FLUSH                              \
+    }
 #define LOG_WARN(fmt, ...) OUTPUT_WARN(fmt, ##__VA_ARGS__)
 #else
-#define LOG_WARN(fmt, ...)
+#define LOG_WARN(fmt, ...) \
+    {                      \
+    }
 #endif
 
 // info
 #if LOG_LEVEL_INFO >= LOG_LEVEL_CURR
-#define OUTPUT_INFO(fmt, ...)               \
-    fprintf(stderr,                         \
-            OUT_LEVEL_INFO fmt OUT_ENDFLAG, \
-            LOG_LABEL, ##__VA_ARGS__)
+#define OUTPUT_INFO(fmt, ...)                   \
+    {                                           \
+        fprintf(stderr,                         \
+                OUT_LEVEL_INFO fmt OUT_ENDFLAG, \
+                LOG_LABEL, ##__VA_ARGS__);      \
+        LOG_FLUSH                               \
+    }
 #define LOG_INFO(fmt, ...) OUTPUT_INFO(fmt, ##__VA_ARGS__)
 #else
-#define LOG_INFO(fmt, ...)
+#define LOG_INFO(fmt, ...) \
+    {                      \
+    }
 #endif
 
 // debug
 #if LOG_LEVEL_DEBUG >= LOG_LEVEL_CURR
-#define OUTPUT_DBG(fmt, ...)               \
-    fprintf(stderr,                        \
-            OUT_LEVEL_DBG fmt OUT_ENDFLAG, \
-            LOG_LABEL, ##__VA_ARGS__)
+#define OUTPUT_DBG(fmt, ...)                   \
+    {                                          \
+        fprintf(stderr,                        \
+                OUT_LEVEL_DBG fmt OUT_ENDFLAG, \
+                LOG_LABEL, ##__VA_ARGS__);     \
+        LOG_FLUSH                              \
+    }
 #define LOG_DBG(fmt, ...) OUTPUT_DBG(fmt, ##__VA_ARGS__)
 #else
-#define LOG_DBG(fmt, ...)
+#define LOG_DBG(fmt, ...) \
+    {                     \
+    }
 #endif
 
-// redirect stderr
-extern void *ezlog_redirect(const char *_log_path);
+#ifdef __cplusplus
+extern "C"
+{
+#endif // __cplusplus
 
-#endif
+    /*
+    windows stderr: "CON"
+    linux stderr: "/dev/console"
+    rtthread stderr: "STDERR"
+    */
+    extern void *ezlog_redirect(const char *_log_path);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
+#endif // _EZLOG_H
